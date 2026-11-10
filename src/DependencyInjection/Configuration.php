@@ -4,21 +4,35 @@ namespace Drenso\DeployerBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Filesystem\Path;
 
 class Configuration implements ConfigurationInterface
 {
-  /**
-   * @return TreeBuilder<'array'>
-   */
+  /** @return TreeBuilder<'array'> */
   public function getConfigTreeBuilder(): TreeBuilder
   {
     $treeBuilder = new TreeBuilder('drenso_deployer');
 
     $rootNode = $treeBuilder->getRootNode();
     $rootNode->children()
-        ->scalarNode('path')
+        ->scalarNode('base_dir')
+        ->info('The path where the deployment related files are to be found')
+        ->defaultValue(Path::join('%kernel.project_dir%', 'deploy'));
+
+    $rootNode->children()
+        ->scalarNode('controllers_dir')
+        ->info('The path where the update controllers are to be found')
+        ->defaultValue('controllers');
+
+    $rootNode->children()
+        ->scalarNode('content_dir')
+        ->info('The path where the update page contents are to be found')
+        ->defaultValue('content');
+
+    $rootNode->children()
+        ->scalarNode('script_dir')
         ->info('The path where the deployment scripts are to be found')
-        ->defaultValue('%kernel.project_dir%' . DIRECTORY_SEPARATOR . 'deploy' . DIRECTORY_SEPARATOR . 'scripts');
+        ->defaultValue('scripts');
 
     $rootNode->children()
         ->scalarNode('namespace')

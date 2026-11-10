@@ -6,6 +6,7 @@ use Drenso\DeployerBundle\Controller\UpdatePreviewController;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
 class DrensoDeployerExtension extends ConfigurableExtension
@@ -15,6 +16,8 @@ class DrensoDeployerExtension extends ConfigurableExtension
   final public const SERVICE_FINDER_ID                  = self::BASE_ID . 'service.finder';
   final public const SERVICE_LOADER_ID                  = self::BASE_ID . 'service.loader';
   final public const SERVICE_PAGES_GENERATOR_FACTORY_ID = self::BASE_ID . 'service.pages_generator_factory';
+  final public const PARAM_CONTENT_PATH_ID              = self::BASE_ID . 'param.content_path';
+  final public const PARAM_CONTROLLERS_PATH_ID          = self::BASE_ID . 'param.controllers_path';
   final public const PARAM_SCRIPTS_PATH_ID              = self::BASE_ID . 'param.scripts_path';
   final public const PARAM_NAMESPACE_ID                 = self::BASE_ID . 'param.namespace';
   final public const PARAM_UPDATE_PAGES                 = self::BASE_ID . 'param.update_pages';
@@ -32,7 +35,10 @@ class DrensoDeployerExtension extends ConfigurableExtension
     $loader->load('services.php');
 
     // Register parameters
-    $container->setParameter(self::PARAM_SCRIPTS_PATH_ID, $mergedConfig['path']);
+    $baseDir = $mergedConfig['base_dir'];
+    $container->setParameter(self::PARAM_CONTROLLERS_PATH_ID, Path::join($baseDir, $mergedConfig['controllers_dir']));
+    $container->setParameter(self::PARAM_CONTENT_PATH_ID, Path::join($baseDir, $mergedConfig['content_dir']));
+    $container->setParameter(self::PARAM_SCRIPTS_PATH_ID, Path::join($baseDir, $mergedConfig['script_dir']));
     $container->setParameter(self::PARAM_NAMESPACE_ID, $mergedConfig['namespace']);
 
     if (!$mergedConfig['generator_enabled']) {

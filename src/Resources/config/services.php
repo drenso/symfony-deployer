@@ -67,6 +67,8 @@ return function (ContainerConfigurator $configurator): void {
     ->args([
       service(DrensoDeployerExtension::SERVICE_PAGES_GENERATOR_FACTORY_ID),
       param('kernel.project_dir'),
+      param(DrensoDeployerExtension::PARAM_CONTROLLERS_PATH_ID),
+      param(DrensoDeployerExtension::PARAM_CONTENT_PATH_ID),
       param(DrensoDeployerExtension::PARAM_UPDATE_PAGES),
     ])
     ->tag('console.command', ['command' => 'drenso:deployer:generate-update-pages']);
