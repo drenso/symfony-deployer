@@ -24,6 +24,7 @@ class DrensoDeployerExtension extends ConfigurableExtension
   final public const COMMAND_GENERATE_ID                = self::BASE_ID . 'command.generate';
   final public const COMMAND_PRE_ID                     = self::BASE_ID . 'command.pre';
   final public const COMMAND_POST_ID                    = self::BASE_ID . 'command.post';
+  final public const COMMAND_BACK_ONLINE_ID             = self::BASE_ID . 'command.back_online';
   final public const COMMAND_GENERATE_PAGES_ID          = self::BASE_ID . 'command.generate_pages';
   final public const TAG_DEPENDENCY                     = self::BASE_ID . 'executer.dependency';
 

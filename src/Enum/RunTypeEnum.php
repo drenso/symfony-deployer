@@ -6,4 +6,5 @@ enum RunTypeEnum
 {
   case PRE;
   case POST;
+  case BACK_ONLINE;
 }

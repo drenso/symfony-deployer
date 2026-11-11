@@ -20,7 +20,7 @@ class {{scriptName}} extends DeploymentScript
 
   public function getRunType(): RunTypeEnum
   {
-    return RunTypeEnum::{% if runType == 'pre' %}PRE{% else %}POST{% endif %};
+    return RunTypeEnum::{{ runType }};
   }
 
   public function runOnce(): bool

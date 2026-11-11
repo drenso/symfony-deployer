@@ -2,6 +2,7 @@
 
 use Drenso\DeployerBundle\Command\GenerateScriptCommand;
 use Drenso\DeployerBundle\Command\GenerateUpdatePagesCommand;
+use Drenso\DeployerBundle\Command\RunBackOnlineDeploymentTasksCommand;
 use Drenso\DeployerBundle\Command\RunPostDeploymentTasksCommand;
 use Drenso\DeployerBundle\Command\RunPreDeploymentTasksCommand;
 use Drenso\DeployerBundle\Controller\UpdatePreviewController;
@@ -49,6 +50,10 @@ return function (ContainerConfigurator $configurator): void {
     ->set(DrensoDeployerExtension::COMMAND_POST_ID, RunPostDeploymentTasksCommand::class)
     ->args([service(DrensoDeployerExtension::SERVICE_EXECUTOR_ID)])
     ->tag('console.command', ['command' => 'drenso:deployer:post'])
+
+    ->set(DrensoDeployerExtension::COMMAND_BACK_ONLINE_ID, RunBackOnlineDeploymentTasksCommand::class)
+    ->args([service(DrensoDeployerExtension::SERVICE_EXECUTOR_ID)])
+    ->tag('console.command', ['command' => 'drenso:deployer:back-online'])
 
     ->set(DrensoDeployerExtension::SERVICE_PAGES_GENERATOR_FACTORY_ID, UpdatePageGeneratorFactory::class)
     ->args([

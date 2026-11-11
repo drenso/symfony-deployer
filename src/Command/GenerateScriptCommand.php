@@ -4,6 +4,8 @@ namespace Drenso\DeployerBundle\Command;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Drenso\DeployerBundle\Enum\RunTypeEnum;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,8 +35,9 @@ class GenerateScriptCommand extends Command
       ->setDescription('Generate a new deployment script')
       ->addArgument('script-name', mode: InputArgument::OPTIONAL)
       ->addOption('run-once', mode: InputOption::VALUE_NONE|InputOption::VALUE_NEGATABLE)
+      ->addOption('pre', mode: InputOption::VALUE_NONE)
       ->addOption('post', mode: InputOption::VALUE_NONE)
-      ->addOption('pre', mode: InputOption::VALUE_NONE);
+      ->addOption('back-online', mode: InputOption::VALUE_NONE);
   }
 
   public function run(InputInterface $input, OutputInterface $output): int
@@ -47,8 +50,12 @@ class GenerateScriptCommand extends Command
       return Command::FAILURE;
     }
 
-    if ($input->getOption('post') && $input->getOption('pre')) {
-      $io->error('Both post and pre options supplied');
+    $runTypeCount = array_filter(
+      [$input->getOption('pre'), $input->getOption('post'), $input->getOption('back-online')],
+      static fn (bool $v): bool => $v,
+    );
+    if (count($runTypeCount) > 1) {
+      $io->error('Pick exactly one of pre, post or back-online');
 
       return Command::INVALID;
     }
@@ -66,21 +73,22 @@ class GenerateScriptCommand extends Command
     }
 
     if (!$scriptName) {
-      $scriptName = $io->ask(
-        'Provide a script name',
-        validator: $scriptNameValidator);
+      $scriptName = $io->ask('Provide a script name', validator: $scriptNameValidator);
     }
 
     $runOnce = $input->getOption('run-once') ?? $io->askQuestion(new ConfirmationQuestion('Should the script only be run once?'));
 
-    if ($input->getOption('post')) {
-      $runType = 'post';
-    } elseif ($input->getOption('pre')) {
+    if ($input->getOption('pre')) {
       $runType = 'pre';
+    } elseif ($input->getOption('post')) {
+      $runType = 'post';
+    } elseif ($input->getOption('back-online')) {
+      $runType = 'back-online';
     } else {
       $runType = $io->askQuestion(new ChoiceQuestion('When should it be run?', [
-        'post' => 'Post deploy',
-        'pre'  => 'Pre deploy',
+        'pre'         => 'Pre deploy',
+        'post'        => 'Post deploy',
+        'back-online' => 'After back online',
       ], 'post'));
     }
 
@@ -95,8 +103,13 @@ class GenerateScriptCommand extends Command
       'namespace'  => $this->namespace,
       'scriptName' => $scriptName,
       'runOnce'    => $runOnce,
-      'runType'    => $runType,
-      'timestamp'  => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('c'),
+      'runType'    => match ($runType) {
+        'pre'         => RunTypeEnum::PRE->name,
+        'post'        => RunTypeEnum::POST->name,
+        'back-online' => RunTypeEnum::BACK_ONLINE->name,
+        default       => throw new RuntimeException('Invalid run type'),
+      },
+      'timestamp' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('c'),
     ]);
 
     if (!file_exists($this->scriptPath)) {
