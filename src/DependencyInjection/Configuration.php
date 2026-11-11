@@ -45,6 +45,16 @@ class Configuration implements ConfigurationInterface
         ->defaultTrue();
 
     $rootNode->children()
+        ->scalarNode('deploy_indicator')
+        ->info('The file that should exists to indicate deployment is running')
+        ->defaultValue('.deploying');
+
+    $rootNode->children()
+        ->scalarNode('block_messenger_worker_during_deploy')
+        ->info('Whether to block messenger worker startup when a deployment is running')
+        ->defaultTrue();
+
+    $rootNode->children()
       ->arrayNode('update_pages')
         ->info('A generator for static update pages')
         ->canBeEnabled()

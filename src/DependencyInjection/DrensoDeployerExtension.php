@@ -11,22 +11,24 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
 class DrensoDeployerExtension extends ConfigurableExtension
 {
-  private const BASE_ID                                 = 'drenso.deployer.';
-  final public const SERVICE_EXECUTOR_ID                = self::BASE_ID . 'service.executor';
-  final public const SERVICE_FINDER_ID                  = self::BASE_ID . 'service.finder';
-  final public const SERVICE_LOADER_ID                  = self::BASE_ID . 'service.loader';
-  final public const SERVICE_PAGES_GENERATOR_FACTORY_ID = self::BASE_ID . 'service.pages_generator_factory';
-  final public const PARAM_CONTENT_PATH_ID              = self::BASE_ID . 'param.content_path';
-  final public const PARAM_CONTROLLERS_PATH_ID          = self::BASE_ID . 'param.controllers_path';
-  final public const PARAM_SCRIPTS_PATH_ID              = self::BASE_ID . 'param.scripts_path';
-  final public const PARAM_NAMESPACE_ID                 = self::BASE_ID . 'param.namespace';
-  final public const PARAM_UPDATE_PAGES                 = self::BASE_ID . 'param.update_pages';
-  final public const COMMAND_GENERATE_ID                = self::BASE_ID . 'command.generate';
-  final public const COMMAND_PRE_ID                     = self::BASE_ID . 'command.pre';
-  final public const COMMAND_POST_ID                    = self::BASE_ID . 'command.post';
-  final public const COMMAND_BACK_ONLINE_ID             = self::BASE_ID . 'command.back_online';
-  final public const COMMAND_GENERATE_PAGES_ID          = self::BASE_ID . 'command.generate_pages';
-  final public const TAG_DEPENDENCY                     = self::BASE_ID . 'executer.dependency';
+  private const BASE_ID                                               = 'drenso.deployer.';
+  final public const SERVICE_EXECUTOR_ID                              = self::BASE_ID . 'service.executor';
+  final public const SERVICE_FINDER_ID                                = self::BASE_ID . 'service.finder';
+  final public const SERVICE_LOADER_ID                                = self::BASE_ID . 'service.loader';
+  final public const SERVICE_PAGES_GENERATOR_FACTORY_ID               = self::BASE_ID . 'service.pages_generator_factory';
+  final public const LISTENER_BLOCK_MESSENGER_WORKER_DURING_DEPLOY_ID = self::BASE_ID . 'listener.block_messenger_worker_during_deploy';
+  final public const PARAM_CONTENT_PATH_ID                            = self::BASE_ID . 'param.content_path';
+  final public const PARAM_CONTROLLERS_PATH_ID                        = self::BASE_ID . 'param.controllers_path';
+  final public const PARAM_SCRIPTS_PATH_ID                            = self::BASE_ID . 'param.scripts_path';
+  final public const PARAM_DEPLOY_INDICATOR                           = self::BASE_ID . 'param.deploy_indicator';
+  final public const PARAM_NAMESPACE_ID                               = self::BASE_ID . 'param.namespace';
+  final public const PARAM_UPDATE_PAGES                               = self::BASE_ID . 'param.update_pages';
+  final public const COMMAND_GENERATE_ID                              = self::BASE_ID . 'command.generate';
+  final public const COMMAND_PRE_ID                                   = self::BASE_ID . 'command.pre';
+  final public const COMMAND_POST_ID                                  = self::BASE_ID . 'command.post';
+  final public const COMMAND_BACK_ONLINE_ID                           = self::BASE_ID . 'command.back_online';
+  final public const COMMAND_GENERATE_PAGES_ID                        = self::BASE_ID . 'command.generate_pages';
+  final public const TAG_DEPENDENCY                                   = self::BASE_ID . 'executer.dependency';
 
   /** @phpstan-ignore missingType.iterableValue */
   public function loadInternal(array $mergedConfig, ContainerBuilder $container): void
@@ -44,6 +46,11 @@ class DrensoDeployerExtension extends ConfigurableExtension
 
     if (!$mergedConfig['generator_enabled']) {
       $container->removeDefinition(self::COMMAND_GENERATE_ID);
+    }
+
+    $container->setParameter(self::PARAM_DEPLOY_INDICATOR, $mergedConfig['deploy_indicator']);
+    if (!$mergedConfig['block_messenger_worker_during_deploy']) {
+      $container->removeDefinition(self::LISTENER_BLOCK_MESSENGER_WORKER_DURING_DEPLOY_ID);
     }
 
     $updatePagesConfig = $mergedConfig['update_pages'];

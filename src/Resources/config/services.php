@@ -11,6 +11,7 @@ use Drenso\DeployerBundle\Executor\ScriptExecutor;
 use Drenso\DeployerBundle\Executor\ScriptFinder;
 use Drenso\DeployerBundle\Executor\ScriptLoader;
 use Drenso\DeployerBundle\Generator\UpdatePageGeneratorFactory;
+use Drenso\DeployerBundle\Messenger\BlockMessengerWorkerDuringDeployListener;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
@@ -76,5 +77,13 @@ return function (ContainerConfigurator $configurator): void {
       param(DrensoDeployerExtension::PARAM_CONTENT_PATH_ID),
       param(DrensoDeployerExtension::PARAM_UPDATE_PAGES),
     ])
-    ->tag('console.command', ['command' => 'drenso:deployer:generate-update-pages']);
+    ->tag('console.command', ['command' => 'drenso:deployer:generate-update-pages'])
+
+    ->set(DrensoDeployerExtension::LISTENER_BLOCK_MESSENGER_WORKER_DURING_DEPLOY_ID, BlockMessengerWorkerDuringDeployListener::class)
+    ->args([
+      param('kernel.project_dir'),
+      param(DrensoDeployerExtension::PARAM_DEPLOY_INDICATOR),
+      service('monolog.logger.messenger')->nullOnInvalid(),
+    ])
+    ->tag('kernel.event_listener');
 };
