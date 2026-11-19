@@ -94,13 +94,8 @@ fi
 
 # Sync assets to their destination
 for i in "${ASSET_PATHS[@]}"; do
-  if [[ "${REPLACE_ASSETS}" = true ]] ; then
-    mv "${i}" "${DEPLOY_DIR}/${i}.old"
-    mv "${DEPLOY_DIR}/${i}" "${i}"
-  else
-    find "${i}" -type f -mtime +120 \( -name "*.js" -o -name "*.js.map" -o -name "*.css" -o -name "*.css.map" -o -name "*.LICENSE.txt" \) -delete
-    rsync -a "${DEPLOY_DIR}/${i}/" "${i}"
-  fi
+  find "${i}" -type f -mtime +120 \( -name "*.js" -o -name "*.js.map" -o -name "*.css" -o -name "*.css.map" -o -name "*.LICENSE.txt" \) -delete
+  rsync -a "${DEPLOY_DIR}/${i}/" "${i}"
 done
 
 # Install vendors (without scripts) and dump the optimized autoload files
