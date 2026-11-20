@@ -70,7 +70,7 @@ done
 
 # Stop running workers
 if [[ "${STOP_RUNNING_MESSENGER_WORKERS}" = true ]] ; then
-  sudo -n -u www-data bin/console messenger:stop-workers
+  sudo -n -u www-data php bin/console messenger:stop-workers
 fi
 
 # Pull the new data
